@@ -2,3 +2,5 @@ node_modules
 *.lock
 .env
 *.log
+package.json
+package-lock.json
