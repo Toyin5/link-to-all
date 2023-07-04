@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Submission for the api security hackathon by treblle",
   "main": "index.js",
+  "scripts": {
+    "start": "nodemon"
+  },
   "type": "module",
   "author": "Toyin",
   "license": "MIT",
@@ -13,5 +16,8 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "mongoose": "^7.3.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
