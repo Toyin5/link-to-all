@@ -1,15 +1,17 @@
 import user from "../models/user.js";
 import bcrypt from "bcrypt";
+import Jwt from "jsonwebtoken";
 import "dotenv/config";
 
 export const registerUser = async (req, res) => {
   const { email, password } = req.body;
+  console.log(email, password);
   const salt = await bcrypt.genSalt(10);
   const userExist = await user.findOne({ email: email });
   if (userExist) {
     return res.status(409).json({
       status: 409,
-      message: "Duplicate",
+      message: "Duplicate User",
     });
   }
 
@@ -23,7 +25,7 @@ export const registerUser = async (req, res) => {
       status: 201,
       message: "Successfully registered",
     });
-  } catch (error) {
+  } catch (err) {
     console.log(err);
     if (err.code === 11000) {
       return res.status(409).json({
@@ -61,7 +63,7 @@ export const logUser = async (req, res) => {
     return res
       .status(409)
       .json({ status: 409, message: "Incorrect Password", token: null });
-  } catch (error) {
+  } catch (err) {
     console.log(err);
     return res.status(400).json({
       status: 400,
