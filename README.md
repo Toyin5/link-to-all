@@ -12,7 +12,8 @@ git clone the repo
 
 ```bash
   cd link-to-all
-  npm install or yarn add
+  npm install or yarn install
+  npm run start or yarn start
 ```
 
 
