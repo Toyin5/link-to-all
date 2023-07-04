@@ -7,10 +7,6 @@ const UserSchema = new Schema(
       type: Schema.Types.UUID,
       default: () => randomUUID(),
     },
-    username: {
-      type: String,
-      required: true,
-    },
     email: {
       type: String,
       required: true,
@@ -19,10 +15,6 @@ const UserSchema = new Schema(
     password: {
       type: String,
       required: true,
-    },
-    links: {
-      type: [Schema.Types.UUID],
-      ref: "links",
     },
   },
   { timestamps: true }

@@ -12,9 +12,6 @@ const LinksSchema = new Schema({
   urls: {
     type: [String],
   },
-  public: {
-    type: Boolean,
-  },
 });
 
 export default Links = model("links", LinksSchema);
