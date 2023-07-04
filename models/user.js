@@ -16,8 +16,12 @@ const UserSchema = new Schema(
       type: String,
       required: true,
     },
+    confirmed: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-export default User = model("user", UserSchema);
+export default model("users", UserSchema);

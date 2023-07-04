@@ -1,7 +1,7 @@
 import { Schema, model } from "mongoose";
 import { randomUUID } from "crypto";
 
-const LinksSchema = new Schema({
+const LinkSchema = new Schema({
   _id: {
     type: Schema.Types.UUID,
     default: () => randomUUID(),
@@ -12,6 +12,15 @@ const LinksSchema = new Schema({
   urls: {
     type: [String],
   },
+  public: {
+    type: Boolean,
+    default: true,
+  },
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "users",
+  },
 });
 
-export default Links = model("links", LinksSchema);
+export default model("links", LinkSchema);
