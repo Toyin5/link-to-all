@@ -78,5 +78,8 @@ export const linkValidate = (method) => {
         body("url", "Invalid URL").exists().isURL(),
       ];
     }
+    case "getLinks": {
+      return [param("id", "Invalid id").exists().isUUID()];
+    }
   }
 };
