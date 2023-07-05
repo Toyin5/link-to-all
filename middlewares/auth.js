@@ -1,15 +1,9 @@
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
 import User from "../models/user.js";
-import rateLimit from "express-rate-limit";
-
-export const limiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 25, //  maximum of 25 request per minute
-});
 
 export const checkHeader = async (req, res, next) => {
-  const authHeader = req.headers["Authorization"];
+  const authHeader = req.headers["authorization"];
   if (!authHeader) {
     return res.status(401).json({ error: "Invalid authorization header" });
   }
@@ -18,7 +12,7 @@ export const checkHeader = async (req, res, next) => {
   try {
     const user = Jwt.verify(token, process.env.JWT_TOKEN);
     if (user) {
-      req.user = user;
+      req["user"] = user;
       next();
     }
   } catch (err) {
@@ -27,15 +21,14 @@ export const checkHeader = async (req, res, next) => {
 };
 
 export const getHeader = async (req, res, next) => {
-  limiter(req, res, next);
-  const authHeader = req.headers["Authorization"];
+  const authHeader = req.headers["authorization"];
   const userExist = await User.findById(req.params.id);
 
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
   }
   if (!authHeader) {
-    req.user = {
+    req["user"] = {
       authorised: false,
       id: userExist._id,
     };
@@ -46,7 +39,7 @@ export const getHeader = async (req, res, next) => {
   try {
     const user = Jwt.verify(token, process.env.JWT_TOKEN);
     if (user) {
-      req.user = {
+      req["user"] = {
         authorised: true,
         id: userExist._id,
       };
@@ -54,7 +47,7 @@ export const getHeader = async (req, res, next) => {
     }
   } catch (err) {
     console.log(err);
-    req.user = {
+    req["user"] = {
       authorised: false,
       id: userExist._id,
     };

@@ -69,6 +69,7 @@ export const loginUser = async (req, res) => {
     const match = await bcrypt.compare(password, userExist.password);
     const user = { id: userExist._id };
     const token = Jwt.sign(user, process.env.JWT_TOKEN);
+
     if (match) {
       return userExist.confirmed
         ? res.status(200).json({
@@ -113,7 +114,7 @@ export const verifyUser = async (req, res) => {
         message: "Account already verified!",
       });
     }
-
+    userExist.confirmed = true;
     await userExist.save();
     res.status(200).json({
       status: 200,
@@ -161,9 +162,7 @@ export const userValidate = (method) => {
     }
 
     case "verifyUser": {
-      return [
-        param("id", "Invalid id").exists().isUUID()
-      ];
+      return [param("id", "Invalid id").exists().isUUID()];
     }
   }
 };

@@ -17,7 +17,7 @@ export const addLink = async (req, res) => {
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
   }
-  
+
   try {
     const newLink = new Links({
       tag,
@@ -34,6 +34,7 @@ export const addLink = async (req, res) => {
 
 export const getLinks = async (req, res) => {
   const { authorised, id } = req.user;
+
   if (!authorised) {
     const allLinks = await Links.find({
       userId: id,
