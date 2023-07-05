@@ -1,7 +1,16 @@
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
 import user from "../models/user.js";
+import rateLimit from "express-rate-limit";
+
+export const limiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 25 //  maximum of 25 request per minute
+})
+
 export const checkHeader = async (req, res, next) => {
+
+  limiter(req, res, next);
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
@@ -21,6 +30,8 @@ export const checkHeader = async (req, res, next) => {
 };
 
 export const getHeader = async (req, res, next) => {
+
+  limiter(req, res, next);
   const authHeader = req.headers.authorization;
   const userExist = await user.findById(req.params.id);
   if (!userExist) {
