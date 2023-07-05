@@ -1,6 +1,6 @@
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
-import user from "../models/user.js";
+import User from "../models/user.js";
 import rateLimit from "express-rate-limit";
 
 export const limiter = rateLimit({
@@ -13,6 +13,9 @@ export const checkHeader = async (req, res, next) => {
   limiter(req, res, next);
   const authHeader = req.headers.authorization;
 
+
+export const checkHeader = async (req, res, next) => {
+  const authHeader = req.headers["Authorization"];
   if (!authHeader) {
     return res.status(401).json({ error: "Invalid authorization header" });
   }
@@ -32,8 +35,9 @@ export const checkHeader = async (req, res, next) => {
 export const getHeader = async (req, res, next) => {
 
   limiter(req, res, next);
-  const authHeader = req.headers.authorization;
-  const userExist = await user.findById(req.params.id);
+  const authHeader = req.headers["Authorization"];
+  const userExist = await User.findById(req.params.id);
+
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
   }
