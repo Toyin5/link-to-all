@@ -3,8 +3,7 @@ import "dotenv/config";
 import User from "../models/user.js";
 
 export const checkHeader = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
+  const authHeader = req.headers["Authorization"];
   if (!authHeader) {
     return res.status(401).json({ error: "Invalid authorization header" });
   }
@@ -22,8 +21,9 @@ export const checkHeader = async (req, res, next) => {
 };
 
 export const getHeader = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers["Authorization"];
   const userExist = await User.findById(req.params.id);
+
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
   }
