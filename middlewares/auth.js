@@ -16,7 +16,7 @@ export const checkHeader = async (req, res, next) => {
   if (!authHeader) {
     return res.status(401).json({ error: "Invalid authorization header" });
   }
-
+  
   const token = authHeader.split(" ")[1];
   try {
     const user = Jwt.verify(token, process.env.JWT_TOKEN);
