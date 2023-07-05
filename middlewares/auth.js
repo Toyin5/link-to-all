@@ -25,7 +25,6 @@ export const getHeader = async (req, res, next) => {
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
   }
-
   if (!authHeader) {
     req.user = {
       authorised: false,
@@ -34,9 +33,7 @@ export const getHeader = async (req, res, next) => {
     next();
     return;
   }
-
   const token = authHeader.split(" ")[1];
-
   try {
     const user = Jwt.verify(token, process.env.JWT_TOKEN);
     if (user) {
