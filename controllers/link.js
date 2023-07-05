@@ -1,14 +1,25 @@
-import links from "../models/links.js";
-import user from "../models/user.js";
+import { body, validationResult } from "express-validator";
+import Links from "../models/links.js";
+import User from "../models/user.js";
+
+const myValidationResult = validationResult.withDefaults({
+  formatter: (error) => error.msg,
+});
 
 export const addLink = async (req, res) => {
+  const errors = myValidationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { tag, url } = req.body;
-  const userExist = await user.findById(req.user.id);
+  const userExist = await User.findById(req.user.id);
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
   }
+  
   try {
-    const newLink = new links({
+    const newLink = new Links({
       tag,
       url,
       userId: userExist._id,
@@ -24,7 +35,7 @@ export const addLink = async (req, res) => {
 export const getLinks = async (req, res) => {
   const { authorised, id } = req.user;
   if (!authorised) {
-    const allLinks = await links.find({
+    const allLinks = await Links.find({
       userId: id,
       public: true,
     });
@@ -40,9 +51,11 @@ export const getLinks = async (req, res) => {
       }),
     });
   }
-  const allLinks = await links.find({
+
+  const allLinks = await Links.find({
     userId: id,
   });
+
   return res.status(200).json({
     status: 200,
     message: "Fetched!",
@@ -54,4 +67,15 @@ export const getLinks = async (req, res) => {
       };
     }),
   });
+};
+
+export const linkValidate = (method) => {
+  switch (method) {
+    case "addLink": {
+      return [
+        body("tag", "Tag is required").exists().isString(),
+        body("url", "Invalid URL").exists().isURL(),
+      ];
+    }
+  }
 };
