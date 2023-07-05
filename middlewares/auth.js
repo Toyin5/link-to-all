@@ -21,7 +21,7 @@ export const checkHeader = async (req, res, next) => {
 };
 
 export const getHeader = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
+  const authHeader = req.headers["Authorization"];
   const userExist = await user.findById(req.params.id);
   if (!userExist) {
     return res.status(404).json({ status: 404, error: "User not found" });
