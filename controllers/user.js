@@ -72,3 +72,26 @@ export const logUser = async (req, res) => {
     });
   }
 };
+
+export const verifyUser = async (req, res) => {
+  const { id } = req.params;
+  const userExist = await user.findById(id);
+  if (!userExist) {
+    return res
+      .status(404)
+      .json({ status: 404, message: "User not found", token: null });
+  }
+  try {
+    userExist.confirmed = true;
+    await userExist.save();
+    res.status(200).json({
+      status: 200,
+      message: "Account Verified!",
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 500,
+      message: "Server error",
+    });
+  }
+};

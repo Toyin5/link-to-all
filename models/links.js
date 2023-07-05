@@ -9,15 +9,15 @@ const LinkSchema = new Schema({
   tag: {
     type: String,
   },
-  urls: {
-    type: [String],
+  url: {
+    type: String,
   },
   public: {
     type: Boolean,
     default: true,
   },
   userId: {
-    type: Schema.Types.ObjectId,
+    type: Schema.Types.UUID,
     required: true,
     ref: "users",
   },
