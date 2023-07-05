@@ -2,8 +2,7 @@ import Jwt from "jsonwebtoken";
 import "dotenv/config";
 import user from "../models/user.js";
 export const checkHeader = async (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
+  const authHeader = req.headers["Authorization"];
   if (!authHeader) {
     return res.status(401).json({ error: "Invalid authorization header" });
   }
