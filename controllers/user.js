@@ -17,11 +17,9 @@ export const registerUser = async (req, res) => {
   }
 
   const { email, password } = req.body;
-  console.log(req);
+
   const salt = await bcrypt.genSalt(10);
-  const userExist = await User.findOne({ email: email });
-  console.log(email);
-  console.log(userExist);
+  const userExist = await User.findOne({ email });
 
   if (userExist) {
     return res.status(409).json({
@@ -32,7 +30,7 @@ export const registerUser = async (req, res) => {
 
   try {
     const newUser = new User({
-      email: email,
+      email,
       password: await bcrypt.hash(password, salt),
     });
     const user = await newUser.save();
@@ -45,12 +43,10 @@ export const registerUser = async (req, res) => {
 
     await verification.save();
 
-    const { _id, email } = user;
-
     return res.status(201).json({
       status: 201,
       message: "Successfully registered",
-      data: { _id, email },
+      data: { id: user._id, email },
     });
   } catch (err) {
     console.log(err);
