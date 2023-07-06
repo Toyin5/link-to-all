@@ -12,17 +12,21 @@ export const addLink = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { tag, url } = req.body;
-  const userExist = await User.findById(req.user.id);
-  if (!userExist) {
-    return res.status(404).json({ status: 404, error: "User not found" });
-  }
+  const { id } = req.user;
+  const { url, tag } = req.body;
 
   try {
+    const user = await User.findById(id);
+    if (!user) {
+      return res
+        .status(404)
+        .json({ status: 404, error: "Authorization required" });
+    }
+
     const newLink = new Links({
       tag,
       url,
-      userId: userExist._id,
+      userId: id,
     });
     await newLink.save();
     res.status(201).json({ status: 201, message: "Link created successfully" });
@@ -35,22 +39,18 @@ export const addLink = async (req, res) => {
 export const getLinks = async (req, res) => {
   const errors = myValidationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-  const { authorised, id } = req.user;
-  const userExist = await User.findById(id);
-  if (!userExist) {
-    return res.status(404).json({ status: 404, error: "User not found" });
+    return res.status(400).json({ errors: "Invalid link" });
   }
 
-  if (!authorised) {
+  const { userId } = req.params;
+
+  try {
     const allLinks = await Links.find({
-      userId: userExist._id,
+      userId,
       public: true,
     });
+
     return res.status(200).json({
-      status: 200,
-      message: "Fetched!",
       data: allLinks.map((link) => {
         const { tag, url } = link;
         return {
@@ -59,23 +59,10 @@ export const getLinks = async (req, res) => {
         };
       }),
     });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ status: 500, error: "Server error" });
   }
-
-  const allLinks = await Links.find({
-    userId: userExist._id,
-  });
-
-  return res.status(200).json({
-    status: 200,
-    message: "Fetched!",
-    data: allLinks.map((link) => {
-      const { tag, url } = link;
-      return {
-        tag,
-        url,
-      };
-    }),
-  });
 };
 
 export const toggleStatus = async (req, res) => {
@@ -83,15 +70,18 @@ export const toggleStatus = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const userExist = await User.findById(req.user.id);
-  if (!userExist) {
-    return res.status(404).json({ status: 404, error: "User not found" });
-  }
+  const { id } = req.user;
+
   try {
     const link = await Links.findOne({
       _id: req.params.id,
-      userId: userExist._id,
+      userId: id,
     });
+    if (!link) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized user. Login as a different user" });
+    }
     link.public = !link.public;
     await link.save();
     res.status(200).json({
@@ -109,19 +99,23 @@ export const deleteLink = async (req, res) => {
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
-  const userExist = await User.findById(req.user.id);
-  if (!userExist) {
-    return res.status(404).json({ status: 404, error: "User not found" });
-  }
+  const { id } = req.user;
+
   try {
     const link = await Links.findOneAndDelete({
       _id: req.params.id,
-      userId: userExist._id,
+      userId: id,
     });
+
+    if (!link) {
+      return res
+        .status(401)
+        .json({ error: "Unauthorized user. Login as a different user" });
+    }
+
     res.status(200).json({
       status: 200,
-      message: "Deleted",
-      link,
+      message: "Deleted"
     });
   } catch (err) {
     console.log(err);
@@ -133,18 +127,18 @@ export const linkValidate = (method) => {
   switch (method) {
     case "addLink": {
       return [
-        body("tag", "Tag is required").exists().isString(),
-        body("url", "Invalid URL").exists().isURL(),
+        body("tag", "Tag is required").isString(),
+        body("url", "Invalid URL").isURL(),
       ];
     }
     case "getLinks": {
-      return [param("id", "Invalid id").exists().isUUID()];
+      return [param("userId").isUUID()];
     }
     case "toggleStatus": {
-      return [param("id", "Invalid id").exists().isUUID()];
+      return [param("id", "Invalid id").isUUID()];
     }
     case "deleteLink": {
-      return [param("id", "Invalid id").exists().isUUID()];
+      return [param("id", "Invalid id").isUUID()];
     }
   }
 };
