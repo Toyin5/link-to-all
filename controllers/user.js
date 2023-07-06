@@ -19,6 +19,7 @@ export const registerUser = async (req, res) => {
   const { email, password } = req.body;
   const salt = await bcrypt.genSalt(10);
   const userExist = await User.findOne({ email: email });
+
   if (userExist) {
     return res.status(409).json({
       status: 409,
@@ -41,9 +42,12 @@ export const registerUser = async (req, res) => {
 
     await verification.save();
 
+    const { _id, email } = user;
+
     return res.status(201).json({
       status: 201,
       message: "Successfully registered",
+      data: {_id, email}
     });
   } catch (err) {
     console.log(err);
