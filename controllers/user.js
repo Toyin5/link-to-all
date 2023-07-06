@@ -1,8 +1,10 @@
 import User from "../models/user.js";
+import Verify from "../models/verify.js";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
 import { body, validationResult, param } from "express-validator";
+import { cryptoToken } from "../utils/helpers.js";
 
 const myValidationResult = validationResult.withDefaults({
   formatter: (error) => error.msg,
@@ -29,7 +31,16 @@ export const registerUser = async (req, res) => {
       email,
       password: await bcrypt.hash(password, salt),
     });
-    await newUser.save();
+    const user = await newUser.save();
+
+    const token = cryptoToken();
+    const verification = new Verify({
+      userId: user._id,
+      token,
+    });
+
+    await verification.save();
+
     return res.status(201).json({
       status: 201,
       message: "Successfully registered",
@@ -68,10 +79,10 @@ export const loginUser = async (req, res) => {
   try {
     const match = await bcrypt.compare(password, userExist.password);
     const user = { id: userExist._id };
-    const token = Jwt.sign(user, process.env.JWT_TOKEN);
+    const token = Jwt.sign(user, process.env.JWT_TOKEN, { expiresIn: 360000 });
 
     if (match) {
-      return userExist.confirmed
+      return userExist.verified
         ? res.status(200).json({
             status: 200,
             message: "Successfully logged in",
@@ -79,7 +90,7 @@ export const loginUser = async (req, res) => {
           })
         : res
             .status(403)
-            .json({ status: 403, message: "Account Pending", token: null });
+            .json({ status: 403, message: "Verify account", token: null });
     }
     return res
       .status(409)
@@ -97,29 +108,23 @@ export const loginUser = async (req, res) => {
 export const verifyUser = async (req, res) => {
   const errors = myValidationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ errors: "Invalid Link" });
   }
 
-  const { id } = req.params;
-  const userExist = await User.findById(id);
-  if (!userExist) {
-    return res
-      .status(404)
-      .json({ status: 404, message: "User not found", token: null });
-  }
+  const { userId, token } = req.params;
+
   try {
-    if (userExist.confirmed === true) {
+    const verification = await Verify.findOne({ userId });
+
+    if (verification && verification.token === token) {
+      await User.findByIdAndUpdate(userId, { verified: true });
+
       return res.status(200).json({
-        status: 200,
-        message: "Account already verified!",
+        message: "User Verified",
       });
     }
-    userExist.confirmed = true;
-    await userExist.save();
-    res.status(200).json({
-      status: 200,
-      message: "Account Verified!",
-    });
+
+    return res.status(400).json({ errors: "Invalid Link" });
   } catch (error) {
     res.status(500).json({
       status: 500,
@@ -162,7 +167,10 @@ export const userValidate = (method) => {
     }
 
     case "verifyUser": {
-      return [param("id", "Invalid id").exists().isUUID()];
+      return [
+        param("userId").exists().isUUID(),
+        param("token").exists().isString(),
+      ];
     }
   }
 };

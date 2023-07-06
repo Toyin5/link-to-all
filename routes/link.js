@@ -6,19 +6,19 @@ import {
   linkValidate,
   toggleStatus,
 } from "../controllers/link.js";
-import { checkHeader, getHeader } from "../middlewares/auth.js";
+import { checkHeader } from "../middlewares/auth.js";
 
 export const linkRoute = express.Router();
 
-linkRoute.post("/link", [checkHeader, linkValidate("addLink")], addLink);
+linkRoute.post("/link", [linkValidate("addLink"), checkHeader], addLink);
 linkRoute.patch(
   "/link/:id",
-  [checkHeader, linkValidate("toggleStatus")],
+  [linkValidate("toggleStatus"), checkHeader],
   toggleStatus
 );
 linkRoute.delete(
   "/link/:id",
-  [checkHeader, linkValidate("deleteLink")],
+  [linkValidate("deleteLink"), checkHeader],
   deleteLink
 );
-linkRoute.get("/links/:id", [getHeader, linkValidate("getLinks")], getLinks);
+linkRoute.get("/links/:userId", linkValidate("getLinks"), getLinks);
