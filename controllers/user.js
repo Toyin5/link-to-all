@@ -22,7 +22,7 @@ export const registerUser = async (req, res) => {
   if (userExist) {
     return res.status(409).json({
       status: 409,
-      message: "Duplicate User",
+      error: "Duplicate User",
     });
   }
 
@@ -50,12 +50,12 @@ export const registerUser = async (req, res) => {
     if (err.code === 11000) {
       return res.status(409).json({
         status: 409,
-        message: "Duplicate",
+        error: "Duplicate user credentials!",
       });
     } else {
       return res.status(500).json({
         status: 500,
-        message: "Server Error!",
+        error: "Server Error!",
       });
     }
   }
