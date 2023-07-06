@@ -18,7 +18,7 @@ const VerifySchema = new Schema({
   expireAt: {
     type: Date,
     default: Date.now(),
-    expires: 18000,
+    index: { expireAfterSeconds: 30 },
   },
 });
 

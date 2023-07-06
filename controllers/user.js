@@ -118,6 +118,7 @@ export const verifyUser = async (req, res) => {
 
     if (verification && verification.token === token) {
       await User.findByIdAndUpdate(userId, { verified: true });
+      await Verify.findByIdAndDelete(userId);
 
       return res.status(200).json({
         message: "User Verified",
@@ -137,26 +138,24 @@ export const userValidate = (method) => {
   switch (method) {
     case "registerUser": {
       return [
-        body("email", "Please enter a valid email.").exists().isEmail(),
+        body("email", "Please enter a valid email.").isEmail(),
         body(
           "password",
           "Please enter a password with 6 or more characters including at least 1 lowercase, 1 uppercase and 1 number."
-        )
-          .exists()
-          .isStrongPassword({
-            minLength: 6,
-            minLowercase: 1,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 0,
-          }),
+        ).isStrongPassword({
+          minLength: 6,
+          minLowercase: 1,
+          minUppercase: 1,
+          minNumbers: 1,
+          minSymbols: 0,
+        }),
       ];
     }
 
     case "loginUser": {
       return [
-        body("email").exists().isEmail(),
-        body("password").exists().isStrongPassword({
+        body("email").isEmail(),
+        body("password").isStrongPassword({
           minLength: 6,
           minLowercase: 1,
           minUppercase: 1,
@@ -167,10 +166,7 @@ export const userValidate = (method) => {
     }
 
     case "verifyUser": {
-      return [
-        param("userId").exists().isUUID(),
-        param("token").exists().isString(),
-      ];
+      return [param("userId").isUUID(), param("token").isString()];
     }
   }
 };

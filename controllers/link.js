@@ -127,18 +127,18 @@ export const linkValidate = (method) => {
   switch (method) {
     case "addLink": {
       return [
-        body("tag", "Tag is required").exists().isString(),
-        body("url", "Invalid URL").exists().isURL(),
+        body("tag", "Tag is required").isString(),
+        body("url", "Invalid URL").isURL(),
       ];
     }
     case "getLinks": {
-      return [param("userId").exists().isUUID()];
+      return [param("userId").isUUID()];
     }
     case "toggleStatus": {
-      return [param("id", "Invalid id").exists().isUUID()];
+      return [param("id", "Invalid id").isUUID()];
     }
     case "deleteLink": {
-      return [param("id", "Invalid id").exists().isUUID()];
+      return [param("id", "Invalid id").isUUID()];
     }
   }
 };

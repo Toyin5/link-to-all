@@ -20,9 +20,6 @@ const UserSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    sessionId: {
-      
-    }
   },
   { timestamps: true }
 );
