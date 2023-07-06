@@ -13,8 +13,10 @@ export const checkHeader = async (req, res, next) => {
     return res.status(401).json({ error: "Authentication required" });
   }
 
+  const token = authToken.split(" ")[1];
+
   try {
-    Jwt.verify(authToken, process.env.JWT_TOKEN, (err, decodedToken) => {
+    Jwt.verify(token, process.env.JWT_TOKEN, (err, decodedToken) => {
       if (err) {
         console.log(err.message);
         return res.status(401).json({ error: "Authentication required" });

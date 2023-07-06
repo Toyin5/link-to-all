@@ -52,10 +52,11 @@ export const getLinks = async (req, res) => {
 
     return res.status(200).json({
       data: allLinks.map((link) => {
-        const { tag, url } = link;
+        const { tag, url, _id } = link;
         return {
           tag,
           url,
+          _id,
         };
       }),
     });
@@ -115,7 +116,7 @@ export const deleteLink = async (req, res) => {
 
     res.status(200).json({
       status: 200,
-      message: "Deleted"
+      message: "Deleted",
     });
   } catch (err) {
     console.log(err);
