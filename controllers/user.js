@@ -3,8 +3,10 @@ import Verify from "../models/verify.js";
 import bcrypt from "bcrypt";
 import Jwt from "jsonwebtoken";
 import "dotenv/config";
-import { body, validationResult, param } from "express-validator";
+import { body, validationResult, param, query } from "express-validator";
 import { cryptoToken } from "../utils/helpers.js";
+import sendEmail from "../utils/sendEmail.js";
+import sendHtml from "../utils/sendHtml.js";
 
 const myValidationResult = validationResult.withDefaults({
   formatter: (error) => error.msg,
@@ -42,6 +44,11 @@ export const registerUser = async (req, res) => {
     });
 
     await verification.save();
+
+    const url = new URL(process.env.VERIFY_URL + user._id);
+    url.searchParams.set("token", token);
+    console.log(url);
+    await sendEmail(email, "Verify your account", sendHtml(url));
 
     return res.status(201).json({
       status: 201,
@@ -114,14 +121,21 @@ export const verifyUser = async (req, res) => {
     return res.status(400).json({ errors: "Invalid Link" });
   }
 
-  const { userId, token } = req.params;
-
+  const { userId } = req.params;
+  const { token } = req.query;
+  console.log(userId, token);
   try {
     const verification = await Verify.findOne({ userId });
 
-    if (verification && verification.token === token) {
+    if (!verification) {
+      return res.status(400).json({
+        error: "Link expired!",
+      });
+    }
+
+    if (verification.token === token) {
       await User.findByIdAndUpdate(userId, { verified: true });
-      await Verify.findByIdAndDelete(userId);
+      await Verify.findOneAndDelete(userId);
 
       return res.status(200).json({
         message: "User Verified",
@@ -169,7 +183,7 @@ export const userValidate = (method) => {
     }
 
     case "verifyUser": {
-      return [param("userId").isUUID(), param("token").isString()];
+      return [param("userId").isUUID(), query("token").isString()];
     }
   }
 };

@@ -10,4 +10,4 @@ export const userRoute = express.Router();
 
 userRoute.post("/auth/register", userValidate("registerUser"), registerUser);
 userRoute.get("/auth/login", userValidate("loginUser"), loginUser);
-userRoute.patch("/auth/verify/:userId/:token", userValidate("verifyUser"), verifyUser);
+userRoute.get("/auth/verify/:userId?", userValidate("verifyUser"), verifyUser);
