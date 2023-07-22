@@ -40,7 +40,7 @@ export default function sendHtml(url) {
   </head>
   <body>
     <header>
-      <img src="/logo.png" alt="logo" />
+      <img src="https://res.cloudinary.com/dr5nmuou0/image/upload/v1690045358/randoms/logo_equxxx.png" alt="logo" />
       <h1>Verify your email address</h1>
     </header>
     <main>
