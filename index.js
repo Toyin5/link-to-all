@@ -16,12 +16,11 @@ const app = express();
 const PORT = 8080;
 
 app.use(cors());
+app.use(express.static("/public"));
 app.use(treblle());
 app.use(express.json());
 app.use("/api/v1", limiter, userRoute);
 app.use("/api/v1", limiter, linkRoute);
-
-//parent endpoints
 
 await database();
 

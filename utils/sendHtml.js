@@ -40,7 +40,7 @@ export default function sendHtml(url) {
   </head>
   <body>
     <header>
-      <img src="https://www.example.com/logo.png" alt="Company logo">
+      <img src="/logo.png" alt="logo" />
       <h1>Verify your email address</h1>
     </header>
     <main>

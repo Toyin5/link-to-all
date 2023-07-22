@@ -6,7 +6,7 @@ import {
   linkValidate,
   toggleStatus,
 } from "../controllers/link.js";
-import { checkHeader } from "../middlewares/auth.js";
+import { checkHeader, resourceHeader } from "../middlewares/auth.js";
 
 export const linkRoute = express.Router();
 
@@ -21,4 +21,8 @@ linkRoute.delete(
   [linkValidate("deleteLink"), checkHeader],
   deleteLink
 );
-linkRoute.get("/links/:userId", linkValidate("getLinks"), getLinks);
+linkRoute.get(
+  "/links/:userId",
+  [linkValidate("getLinks"), resourceHeader],
+  getLinks
+);

@@ -9,5 +9,5 @@ import {
 export const userRoute = express.Router();
 
 userRoute.post("/auth/register", userValidate("registerUser"), registerUser);
-userRoute.get("/auth/login", userValidate("loginUser"), loginUser);
+userRoute.post("/auth/login", userValidate("loginUser"), loginUser);
 userRoute.get("/auth/verify/:userId?", userValidate("verifyUser"), verifyUser);

@@ -74,6 +74,7 @@ export const registerUser = async (req, res) => {
 export const loginUser = async (req, res) => {
   const errors = myValidationResult(req);
   if (!errors.isEmpty()) {
+    console.log(errors);
     return res
       .status(400)
       .json({ errors: "You have entered an invalid email or password" });

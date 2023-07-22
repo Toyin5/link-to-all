@@ -43,12 +43,14 @@ export const getLinks = async (req, res) => {
   }
 
   const { userId } = req.params;
+  const auth = req.auth;
+  const query = { userId };
+  if (!auth) {
+    query.public = true;
+  }
 
   try {
-    const allLinks = await Links.find({
-      userId,
-      public: true,
-    });
+    const allLinks = await Links.find(query);
 
     return res.status(200).json({
       data: allLinks.map((link) => {
