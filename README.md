@@ -3,7 +3,7 @@
 
 An api that allow users to add their social links
 
-
+![logo](https://res.cloudinary.com/dr5nmuou0/image/upload/v1690045358/randoms/logo_equxxx.png)
 
 
 ## Installation
